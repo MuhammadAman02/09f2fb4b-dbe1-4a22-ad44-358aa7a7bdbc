@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { getAllFruits, getFruitById } from '../services/fruit.service';
+import { getAllFruits, getFruitById, createFruit } from '../services/fruit.service';
 import { AppError } from '../utils/AppError';
 
 export async function getFruitsHandler(
@@ -28,12 +28,27 @@ export async function getFruitByIdHandler(
     res.status(200).send(fruit);
   } catch (error: any) {
     console.error('Error fetching fruit:', error);
-    if (error.message.includes('not found')) {
-      res.status(404).send({ error: error.message });
-    } else if (error instanceof AppError) {
+    if (error instanceof AppError) {
       res.status(error.statusCode).send({ error: error.message });
     } else {
       res.status(500).send({ error: 'Failed to fetch fruit' });
+    }
+  }
+}
+
+export async function createFruitHandler(
+  req: FastifyRequest<{ Body: { name: string; color: string; category: string } }>,
+  res: FastifyReply
+) {
+  try {
+    const fruit = await createFruit(req.body);
+    res.status(201).send(fruit);
+  } catch (error: any) {
+    console.error('Error creating fruit:', error);
+    if (error instanceof AppError) {
+      res.status(error.statusCode).send({ error: error.message });
+    } else {
+      res.status(500).send({ error: 'Failed to create fruit' });
     }
   }
 }
