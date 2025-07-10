@@ -9,9 +9,15 @@ const FruitZod = z.object({
   category: z.string(),
 });
 
-const GetFruitsResponseZod = z.array(FruitZod);
+const CreateFruitZod = z.object({
+  name: z.string().min(1, "Name is required"),
+  color: z.string().min(1, "Color is required"),
+  category: z.string().min(1, "Category is required"),
+});
 
+const GetFruitsResponseZod = z.array(FruitZod);
 const GetFruitByIdResponseZod = FruitZod;
+const CreateFruitResponseZod = FruitZod;
 
 // Fastify-compatible JSON schemas
 export const getFruitsSchema = {
@@ -29,6 +35,31 @@ export const getFruitByIdSchema = {
   response: {
     200: zodToJsonSchema(GetFruitByIdResponseZod),
     404: zodToJsonSchema(z.object({
+      error: z.string(),
+    })),
+  },
+};
+
+export const createFruitSchema = {
+  tags: ["Fruits"],
+  body: zodToJsonSchema(CreateFruitZod),
+  response: {
+    201: zodToJsonSchema(CreateFruitResponseZod),
+    400: zodToJsonSchema(z.object({
+      error: z.string(),
+    })),
+  },
+};
+
+export const seedFruitsSchema = {
+  tags: ["Fruits"],
+  summary: "Seed database with initial fruit data",
+  description: "Populates the fruits table with 10 sample fruits if the table is empty",
+  response: {
+    200: zodToJsonSchema(z.object({
+      message: z.string(),
+    })),
+    500: zodToJsonSchema(z.object({
       error: z.string(),
     })),
   },
