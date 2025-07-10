@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { getFruitsHandler, getFruitByIdHandler } from '../controllers/fruit.controller';
-import { getFruitsSchema, getFruitByIdSchema } from '../schemas/fruit.schema';
+import { getFruitsHandler, getFruitByIdHandler, createFruitHandler } from '../controllers/fruit.controller';
+import { getFruitsSchema, getFruitByIdSchema, createFruitSchema, seedFruitsSchema } from '../schemas/fruit.schema';
 import { seedFruits } from '../services/fruit.service';
 
 export async function fruitRoutes(app: FastifyInstance) {
@@ -16,19 +16,15 @@ export async function fruitRoutes(app: FastifyInstance) {
     handler: getFruitByIdHandler,
   });
 
+  // POST /api/fruits - Create a new fruit
+  app.post('/api/fruits', {
+    schema: createFruitSchema,
+    handler: createFruitHandler,
+  });
+
   // POST /api/fruits/seed - Seed the database with initial fruit data
   app.post('/api/fruits/seed', {
-    schema: {
-      tags: ["Fruits"],
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            message: { type: 'string' }
-          }
-        }
-      }
-    },
+    schema: seedFruitsSchema,
     handler: async (req, res) => {
       try {
         await seedFruits();
